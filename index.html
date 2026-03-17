@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KMS + System</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <header class="topbar">
+        <nav>
+            <div class="logo"><img src="logo.jpeg" alt="KMS Logo" style="height: 40px;"></div>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="login.html">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>KMS World</h1>
+            <p>Master Your Knowledge The ultimate workspace for your notes, links, and team intelligence. Organize, collaborate, and grow with KMS World.</p>
+            <div class="hero-actions">
+                <a href="login.html" class="cta-button">Start for Free</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="features">
+        <h2>Everything you need</h2>
+        <div class="feature-grid">
+            <article class="feature">
+                <a href="organize.html" class="feature-btn">Organize</a>
+                <p>Build a second brain. Categorize notes, tag links, and find exactly what you need in seconds with our lightning-fast search.</p>
+            </article>
+            <article class="feature">
+                <a href="collaborate.html" class="feature-btn">Collaborate</a>
+                <p>Teamwork made simple. Share spaces, edit in real-time, and build a collective knowledge base that scales with your ambition.</p>
+            </article>
+            <article class="feature">
+                <a href="games.html" class="feature-btn">Games</a>
+                <p>Learning through play. Enhance your memory and test your knowledge with interactive games designed for the modern mind.</p>
+            </article>
+        </div>
+    </section>
+
+    <dialog id="contact-modal">
+        <h2>Contact Us</h2>
+        <form method="dialog">
+            <input type="text" placeholder="Name" required>
+            <input type="email" placeholder="Email" required>
+            <textarea placeholder="Message"></textarea>
+            <button type="submit">Send</button>
+            <button type="button" onclick="this.closest('dialog').close()">Close</button>
+        </form>
+    </dialog>
+
+    <footer>
+        <button onclick="document.getElementById('contact-modal').showModal()">Contact Us</button>
+        <p>&copy; 2026 KMS. All rights reserved. | <a href="terms.html" style="color: #ffe178;">Terms</a> | <a href="privacy.html" style="color: #ffe178;">Privacy Policy</a></p>
+    </footer>
+</body>
+
+</html>
