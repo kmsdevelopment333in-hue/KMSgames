@@ -1,0 +1,215 @@
+body,
+html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #1a1a1a;
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    user-select: none; /* Prevent text selection while playing */
+    touch-action: none; /* Prevent accidental zooming or gestures */
+}
+
+#ui {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    user-select: none;
+    pointer-events: none;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    z-index: 5;
+}
+
+#startScreen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(26, 26, 26, 0.9) 0%, rgba(10, 10, 10, 1) 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    font-family: 'Segoe UI', sans-serif;
+    color: white;
+    transition: opacity 0.5s ease;
+}
+
+#startScreen .content {
+    text-align: center;
+    background: rgba(40, 40, 40, 0.5);
+    padding: 60px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+}
+
+#startScreen h1 {
+    font-size: clamp(2rem, 10vw, 4rem);
+    margin: 0;
+    letter-spacing: clamp(5px, 2vw, 15px);
+    background: linear-gradient(90deg, #4CAF50, #00BCD4);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+}
+
+#startScreen p {
+    font-size: 1.2rem;
+    color: #888;
+    margin-bottom: 40px;
+    letter-spacing: 5px;
+}
+
+#startButton {
+    background: transparent;
+    border: 2px solid #4CAF50;
+    color: #4CAF50;
+    padding: 15px 40px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 5px;
+    font-weight: bold;
+    letter-spacing: 3px;
+    box-shadow: 0 0 15px rgba(76, 175, 80, 0.2);
+}
+
+#startButton:hover {
+    background: #4CAF50;
+    color: white;
+    box-shadow: 0 0 30px rgba(76, 175, 80, 0.5);
+    transform: scale(1.05);
+}
+
+.controls-hint {
+    margin-top: 40px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    justify-content: center;
+    font-size: 0.8rem;
+    color: #555;
+    text-transform: uppercase;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 10px;
+}
+
+.control-group p {
+    margin: 0 0 5px 0 !important;
+    color: #00BCD4 !important;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+.controls-hint span {
+    border: 1px solid #333;
+    padding: 5px 10px;
+    border-radius: 4px;
+    width: fit-content;
+}
+
+h1 {
+    margin: 0 0 10px 0;
+    font-size: 28px;
+    color: #000000;
+    text-shadow: 2px 2px 4px #000;
+}
+
+p {
+    margin: 5px 0;
+    font-size: 16px;
+    color: #ddd;
+}
+
+canvas {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    touch-action: none;
+}
+
+@media (max-width: 768px) {
+    #startScreen .content {
+        padding: 30px 20px;
+        width: 90%;
+    }
+
+    .controls-hint {
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    #ui {
+        top: 10px;
+        left: 10px;
+        font-size: 0.8rem;
+    }
+
+    #ui h1 {
+        font-size: 1.2rem;
+    }
+
+    #ui p {
+        font-size: 0.7rem;
+    }
+}
+
+.sensitivity-setting {
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    color: #888;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.sensitivity-setting label {
+    color: #00BCD4;
+    font-weight: bold;
+}
+
+.sensitivity-setting input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 220px;
+    height: 4px;
+    background: #333;
+    border-radius: 4px;
+    outline: none;
+    cursor: pointer;
+}
+
+.sensitivity-setting input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #4CAF50;
+    box-shadow: 0 0 8px rgba(76,175,80,0.6);
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+.sensitivity-setting input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+}

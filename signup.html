@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KMS | Sign up</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithCredential } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBckxPo3TKfq0O2iyg27TmKKdpswKRP_1o",
+            authDomain: "kmswed-7b566.firebaseapp.com",
+            projectId: "kmswed-7b566",
+            storageBucket: "kmswed-7b566.firebasestorage.app",
+            messagingSenderId: "88104782095",
+            appId: "1:88104782095:web:a82a695028368b2df3d67a",
+            measurementId: "G-P6WNFKJYNZ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Google Sign-In (Credential from One Tap)
+        window.handleCredentialResponse = function(response) {
+            const credential = GoogleAuthProvider.credential(response.credential);
+            signInWithCredential(auth, credential)
+                .then((result) => {
+                    console.log("Google Signup Success", result.user);
+                    window.location.href = 'index.html';
+                })
+                .catch((error) => {
+                    console.error("Google Signup Error", error);
+                    alert("Signup failed: " + error.message);
+                });
+        };
+
+        // UI Helpers
+        (function () {
+            const form = document.querySelector(".auth-form");
+            const fullNameInput = document.getElementById("fullName");
+            const emailInput = document.getElementById("signupEmail");
+            const passwordInput = document.getElementById("newPassword");
+            const confirmPasswordInput = document.getElementById("confirmPassword");
+            const matchHint = document.getElementById("match-hint");
+            const toggleBtn = document.querySelector("[data-toggle-password]");
+
+            function validateMatch() {
+                if (!matchHint) return true;
+                const ok = passwordInput.value && confirmPasswordInput.value && passwordInput.value === confirmPasswordInput.value;
+                matchHint.hidden = ok || !confirmPasswordInput.value;
+                return ok || !confirmPasswordInput.value;
+            }
+
+            if (toggleBtn && passwordInput) {
+                toggleBtn.addEventListener("click", () => {
+                    const isPassword = passwordInput.type === "password";
+                    passwordInput.type = isPassword ? "text" : "password";
+                    toggleBtn.textContent = isPassword ? "Hide" : "Show";
+                    passwordInput.focus();
+                });
+            }
+
+            if (confirmPasswordInput) {
+                confirmPasswordInput.addEventListener("input", validateMatch);
+            }
+            if (passwordInput) {
+                passwordInput.addEventListener("input", validateMatch);
+            }
+
+            if (form) {
+                form.addEventListener("submit", (e) => {
+                    e.preventDefault();
+                    if (!validateMatch()) {
+                        confirmPasswordInput.focus();
+                        return;
+                    }
+
+                    const fullName = fullNameInput.value;
+                    const email = emailInput.value;
+                    const password = passwordInput.value;
+
+                    if (!email || !password) return;
+
+                    const btn = form.querySelector(".auth-submit");
+                    btn.disabled = true;
+                    btn.textContent = "Creating...";
+
+                    createUserWithEmailAndPassword(auth, email, password)
+                        .then((userCredential) => {
+                            const user = userCredential.user;
+                            return updateProfile(user, { displayName: fullName });
+                        })
+                        .then(() => {
+                            console.log("Profile updated, redirecting...");
+                            window.location.href = 'index.html';
+                        })
+                        .catch((error) => {
+                            console.error("Signup error:", error);
+                            btn.disabled = false;
+                            btn.textContent = "Create account";
+                            alert(error.message);
+                        });
+                });
+            }
+        })();
+    </script>
+</head>
+
+<body class="auth-page">
+    <header class="topbar topbar--auth">
+        <nav>
+            <div class="logo">
+                <a class="brand-link" href="index.html" aria-label="KMS Home">
+                    <img src="logo.jpeg" alt="KMS Logo" style="height: 40px;">
+                </a>
+            </div>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="index.html#features">Features</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="login.html">Log in</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="auth-shell" aria-label="Sign up page">
+        <section class="auth-brand" aria-label="Product description">
+            <div class="auth-brand__badge">KMS</div>
+            <h1 class="auth-brand__title">Create your workspace.</h1>
+            <p class="auth-brand__subtitle">Get a clean dashboard for organizing and sharing knowledge.</p>
+            <ul class="auth-brand__list" aria-label="Highlights">
+                <li>Personal collections and tags</li>
+                <li>Invite collaborators anytime</li>
+                <li>Quick access across devices</li>
+            </ul>
+            <div class="auth-brand__fineprint">Already have an account? <a class="auth-link" href="login.html">Log
+                    in</a>.</div>
+        </section>
+
+        <section class="auth-card" aria-label="Sign up form">
+            <div class="auth-card__header">
+                <div class="auth-card__eyebrow">Get started</div>
+                <h2 class="auth-card__title">Sign up</h2>
+            </div>
+
+            <form class="auth-form" action="#" method="post" autocomplete="on" novalidate>
+                <div class="field">
+                    <label class="field__label" for="fullName">Full name</label>
+                    <input class="field__input" id="fullName" name="fullName" type="text" autocomplete="name"
+                        placeholder="Your name" required>
+                </div>
+
+                <div class="field">
+                    <label class="field__label" for="signupEmail">Email</label>
+                    <input class="field__input" id="signupEmail" name="email" type="email" inputmode="email"
+                        autocomplete="email" placeholder="name@company.com" required>
+                </div>
+
+                <div class="field">
+                    <label class="field__label" for="newPassword">Password</label>
+                    <div class="field__row">
+                        <input class="field__input" id="newPassword" name="password" type="password"
+                            autocomplete="new-password" placeholder="Create a password" required>
+                        <button class="field__toggle" type="button" data-toggle-password
+                            aria-label="Show password">Show</button>
+                    </div>
+                    <div class="field__hint">Use 8+ characters.</div>
+                </div>
+
+                <div class="field">
+                    <label class="field__label" for="confirmPassword">Confirm password</label>
+                    <input class="field__input" id="confirmPassword" name="confirmPassword" type="password"
+                        autocomplete="new-password" placeholder="Re-enter password" required>
+                    <div class="field__hint" id="match-hint" hidden>Passwords do not match.</div>
+                </div>
+
+                <button class="auth-submit" type="submit">Create account</button>
+
+                <div class="auth-divider" role="separator" aria-label="Other options">
+                    <span>or</span>
+                </div>
+
+                    <div class="auth-alt">
+                    <div id="g_id_onload"
+                        data-client_id="88104782095-imduruhq2tdoelkjeb02qv72dgo3sa4l.apps.googleusercontent.com"
+                        data-context="signup" data-ux_mode="popup" data-callback="handleCredentialResponse"
+                        data-auto_prompt="false">
+                    </div>
+                    <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline"
+                        data-text="signup_with" data-size="large" data-logo_alignment="left" data-width="100%">
+                    </div>
+                </div>
+            </form>
+
+            <div class="auth-card__footer">
+                <span>By signing up you accept our <a class="auth-link" href="terms.html">Terms</a> and <a
+                        class="auth-link" href="privacy.html">Privacy Policy</a>.</span>
+            </div>
+        </section>
+    </main>
+</body>
+
+</html>
