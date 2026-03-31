@@ -23,10 +23,7 @@ const mouse = { x: canvas.width / 2, y: canvas.height / 2 };
 let isGameOver = false;
 let mouseSensitivity = 1.0;
 
-// Touch state
-let leftTouch = { id: null, startX: 0, startY: 0, currentX: 0, currentY: 0 };
-let rightTouch = { id: null, startX: 0, startY: 0, currentX: 0, currentY: 0 };
-const joystickRadius = 50;
+// Touch state removed - desktop only
 let lastShootTime = 0;
 const shootInterval = 150;
 
@@ -74,8 +71,7 @@ window.addEventListener('mousemove', (e) => {
 });
 
 window.addEventListener('mousedown', (e) => {
-    // Request pointer lock on desktop only
-    if (!isMobile() && !isGameOver && startScreen.style.display === 'none') {
+    if (!isGameOver && startScreen.style.display === 'none') {
         canvas.requestPointerLock();
     }
     if (e.button === 0 && !isGameOver) {
@@ -85,58 +81,6 @@ window.addEventListener('mousedown', (e) => {
     }
 });
 
-// Touch controls
-window.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    for (let i = 0; i < e.changedTouches.length; i++) {
-        const touch = e.changedTouches[i];
-        if (isGameOver) { resetGame(); return; }
-        if (touch.clientX < canvas.width / 2 && leftTouch.id === null) {
-            leftTouch.id = touch.identifier;
-            leftTouch.startX = touch.clientX;
-            leftTouch.startY = touch.clientY;
-            leftTouch.currentX = touch.clientX;
-            leftTouch.currentY = touch.clientY;
-        } else if (touch.clientX >= canvas.width / 2 && rightTouch.id === null) {
-            rightTouch.id = touch.identifier;
-            rightTouch.startX = touch.clientX;
-            rightTouch.startY = touch.clientY;
-            rightTouch.currentX = touch.clientX;
-            rightTouch.currentY = touch.clientY;
-        }
-    }
-}, { passive: false });
-
-window.addEventListener('touchmove', (e) => {
-    e.preventDefault();
-    for (let i = 0; i < e.changedTouches.length; i++) {
-        const touch = e.changedTouches[i];
-        if (touch.identifier === leftTouch.id) {
-            leftTouch.currentX = touch.clientX;
-            leftTouch.currentY = touch.clientY;
-        } else if (touch.identifier === rightTouch.id) {
-            rightTouch.currentX = touch.clientX;
-            rightTouch.currentY = touch.clientY;
-        }
-    }
-}, { passive: false });
-
-window.addEventListener('touchend', (e) => {
-    e.preventDefault();
-    for (let i = 0; i < e.changedTouches.length; i++) {
-        const touch = e.changedTouches[i];
-        if (touch.identifier === leftTouch.id) leftTouch.id = null;
-        if (touch.identifier === rightTouch.id) rightTouch.id = null;
-    }
-}, { passive: false });
-
-window.addEventListener('touchcancel', (e) => {
-    for (let i = 0; i < e.changedTouches.length; i++) {
-        const touch = e.changedTouches[i];
-        if (touch.identifier === leftTouch.id) leftTouch.id = null;
-        if (touch.identifier === rightTouch.id) rightTouch.id = null;
-    }
-});
 
 // Classes
 class Player {
@@ -174,40 +118,17 @@ class Player {
     }
 
     update() {
-        // Increase speed when score reaches 500
-        this.speed = score >= 500 ? 7 : 4;
+        // Speed grows gradually with score
+        this.speed = 4 + (score / 100);
 
-        if (leftTouch.id !== null) {
-            const dx = leftTouch.currentX - leftTouch.startX;
-            const dy = leftTouch.currentY - leftTouch.startY;
-            const distance = Math.hypot(dx, dy);
+        // Movement boundaries
+        if (keys.w && this.y - this.radius > 0) this.y -= this.speed;
+        if (keys.s && this.y + this.radius < canvas.height) this.y += this.speed;
+        if (keys.a && this.x - this.radius > 0) this.x -= this.speed;
+        if (keys.d && this.x + this.radius < canvas.width) this.x += this.speed;
 
-            if (distance > 0) {
-                const speedMultiplier = Math.min(distance / joystickRadius, 1);
-                const moveX = (dx / distance) * this.speed * speedMultiplier;
-                const moveY = (dy / distance) * this.speed * speedMultiplier;
-
-                if (this.x + moveX - this.radius > 0 && this.x + moveX + this.radius < canvas.width) this.x += moveX;
-                if (this.y + moveY - this.radius > 0 && this.y + moveY + this.radius < canvas.height) this.y += moveY;
-            }
-        } else {
-            // Movement boundaries
-            if (keys.w && this.y - this.radius > 0) this.y -= this.speed;
-            if (keys.s && this.y + this.radius < canvas.height) this.y += this.speed;
-            if (keys.a && this.x - this.radius > 0) this.x -= this.speed;
-            if (keys.d && this.x + this.radius < canvas.width) this.x += this.speed;
-        }
-
-        // Mouse look (Angle calculation)
-        if (rightTouch.id !== null) {
-            const dx = rightTouch.currentX - rightTouch.startX;
-            const dy = rightTouch.currentY - rightTouch.startY;
-            if (Math.hypot(dx, dy) > 10) {
-                this.angle = Math.atan2(dy, dx);
-            }
-        } else {
-            this.angle = Math.atan2(mouse.y - this.y, mouse.x - this.x);
-        }
+        // Mouse aim
+        this.angle = Math.atan2(mouse.y - this.y, mouse.x - this.x);
     }
 }
 
@@ -408,15 +329,6 @@ function animate() {
     ctx.fillStyle = 'rgba(26, 26, 26, 0.2)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Touch shooting — shoot whenever right joystick is active
-    if (rightTouch.id !== null && !isGameOver) {
-        const dx = rightTouch.currentX - rightTouch.startX;
-        const dy = rightTouch.currentY - rightTouch.startY;
-        const dist = Math.hypot(dx, dy);
-        // Shoot in aimed direction, or forward if just tapping
-        const angle = dist > 5 ? Math.atan2(dy, dx) : player.angle;
-        shoot(angle);
-    }
 
     player.update();
     player.draw();
@@ -495,8 +407,6 @@ function animate() {
             }
         }
     }
-
-    drawJoysticks();
 }
 
 function gameOver() {
@@ -523,7 +433,7 @@ function gameOver() {
     ctx.font = '24px "Segoe UI"';
     ctx.fillText('Your Score: ' + score, canvas.width / 2, canvas.height / 2 + 30);
     ctx.fillText('Max Level: ' + level, canvas.width / 2, canvas.height / 2 + 70);
-    ctx.fillText('Click or Tap to play again', canvas.width / 2, canvas.height / 2 + 110);
+    ctx.fillText('Click to play again', canvas.width / 2, canvas.height / 2 + 110);
 }
 
 function showLevelUpMessage() {
@@ -553,54 +463,6 @@ function resetGame() {
     animate();
 }
 
-function drawJoysticks() {
-    ctx.lineWidth = 2;
-    if (leftTouch.id !== null) {
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(leftTouch.startX, leftTouch.startY, joystickRadius, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-        ctx.stroke();
-
-        ctx.beginPath();
-        const dx = leftTouch.currentX - leftTouch.startX;
-        const dy = leftTouch.currentY - leftTouch.startY;
-        const distance = Math.min(Math.hypot(dx, dy), joystickRadius);
-        const angle = Math.atan2(dy, dx);
-        const knobX = leftTouch.startX + Math.cos(angle) * distance;
-        const knobY = leftTouch.startY + Math.sin(angle) * distance;
-
-        ctx.arc(knobX, knobY, 20, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-        ctx.fill();
-        ctx.restore();
-    }
-
-    if (rightTouch.id !== null) {
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(rightTouch.startX, rightTouch.startY, joystickRadius, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-        ctx.stroke();
-
-        ctx.beginPath();
-        const dx = rightTouch.currentX - rightTouch.startX;
-        const dy = rightTouch.currentY - rightTouch.startY;
-        const distance = Math.min(Math.hypot(dx, dy), joystickRadius);
-        const angle = Math.atan2(dy, dx);
-        const knobX = rightTouch.startX + Math.cos(angle) * distance;
-        const knobY = rightTouch.startY + Math.sin(angle) * distance;
-
-        ctx.arc(knobX, knobY, 20, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-        ctx.fill();
-        ctx.restore();
-    }
-}
 
 function startGame() {
     startScreen.style.opacity = '0';
@@ -609,15 +471,9 @@ function startGame() {
         init();
         spawnEnemies();
         animate();
-        // Only request pointer lock on desktop
-        if (!isMobile()) {
-            canvas.requestPointerLock();
-        }
+        initAudio();
+        canvas.requestPointerLock();
     }, 500);
-}
-
-function isMobile() {
-    return /Android|iPhone|iPad|iPod|Touch/i.test(navigator.userAgent) || window.matchMedia('(pointer: coarse)').matches;
 }
 
 startButton.addEventListener('click', startGame);
