@@ -50,6 +50,13 @@ window.addEventListener('keydown', (e) => {
             shoot();
         }
     }
+
+    // E for 360° burst
+    if (e.code === 'KeyE') {
+        if (!isGameOver && startScreen.style.display === 'none') {
+            shoot360();
+        }
+    }
 });
 
 window.addEventListener('keyup', (e) => {
@@ -254,12 +261,28 @@ function shoot(overrideAngle) {
         y: Math.sin(angle) * 12
     };
     projectiles.push(new Projectile(player.x, player.y, 6, '#ffeb3b', velocity));
-
     playShootSound();
+}
 
-    // Shoot recoil effect (optional camera shake or slight backward movement)
-    // player.x -= Math.cos(angle) * 2;
-    // player.y -= Math.sin(angle) * 2;
+// 360° burst — fires bullets in all directions evenly
+let last360Time = 0;
+const burst360Cooldown = 800;
+
+function shoot360() {
+    const now = Date.now();
+    if (now - last360Time < burst360Cooldown) return;
+    last360Time = now;
+
+    const bulletCount = 12;
+    for (let i = 0; i < bulletCount; i++) {
+        const angle = (i / bulletCount) * Math.PI * 2;
+        const velocity = {
+            x: Math.cos(angle) * 12,
+            y: Math.sin(angle) * 12
+        };
+        projectiles.push(new Projectile(player.x, player.y, 6, '#ff6b35', velocity));
+    }
+    playShootSound();
 }
 
 function createExplosion(x, y, color, count) {
